@@ -1,0 +1,30 @@
+plugins {
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
+	id 'java'
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+group = 'vn.example.jetty'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
+	implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
+	implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+	runtime('mysql:mysql-connector-java')
+	compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	compile group: 'commons-io', name: 'commons-io', version: '2.6'
+	
+	testCompile("org.junit.jupiter:junit-jupiter-api:5.3.1")
+	testCompile('org.mockito:mockito-junit-jupiter:2.18.3')
+	testCompile "org.mockito:mockito-core:2.+"
+	testCompile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.3.1'
+	testRuntime("org.junit.jupiter:junit-jupiter-engine:5.3.1")
+}

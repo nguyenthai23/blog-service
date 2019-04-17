@@ -2,10 +2,12 @@ package vn.example.blog.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
+import org.apache.thrift.TException;
+import org.apache.thrift.transport.TTransport;
 import vn.example.blog.domain.SimpleResponse;
-import vn.example.blog.entity.Blog;
-import vn.example.blog.service.BlogService;
-import vn.example.blog.utils.ServiceFactory;
+import vn.example.blog.thrift.Blog;
+import vn.example.blog.thrift.BlogService;
+import vn.example.blog.thrift.client.ThriftClient;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,40 +23,74 @@ public class BlogServlet extends HttpServlet {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private BlogService blogService = ServiceFactory.getBlogService();
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
-        if (id != null && !id.isEmpty()) {
-            Blog blog = this.blogService.getBlog(Long.parseLong(id));
-            this.setResponse(response, blog);
-            return;
+        TTransport transport = ThriftClient.getTRANSPORT();
+        try {
+            BlogService.Client blogService = ThriftClient.getBlogService(transport);
+            String id = request.getParameter("id");
+            if (id != null && !id.isEmpty()) {
+                Blog blog = blogService.getBlog(Long.parseLong(id));
+                this.setResponse(response, blog);
+                return;
+            }
+            List<Blog> blogs = blogService.getBlogs();
+            this.setResponse(response, blogs);
+        } catch (TException e) {
+            e.printStackTrace();
+            this.setResponseError(response);
+        } finally {
+            transport.close();
         }
-        List<Blog> blogs = this.blogService.getBlogs();
-        this.setResponse(response, blogs);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Blog blog = mapper.readValue(IOUtils.toString(request.getReader()), Blog.class);
-        blog = this.blogService.createBlog(blog);
-        this.setResponse(response, blog);
+        TTransport transport = ThriftClient.getTRANSPORT();
+        try {
+            BlogService.Client blogService = ThriftClient.getBlogService(transport);
+            Blog blog = mapper.readValue(IOUtils.toString(request.getReader()), Blog.class);
+            blog = blogService.createBlog(blog);
+            this.setResponse(response, blog);
+        } catch (TException e) {
+            e.printStackTrace();
+            this.setResponseError(response);
+        } finally {
+            transport.close();
+        }
     }
 
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Blog blog = mapper.readValue(IOUtils.toString(request.getReader()), Blog.class);
-        blog = this.blogService.updateBlog(blog);
-        this.setResponse(response, blog);
+        TTransport transport = ThriftClient.getTRANSPORT();
+        try {
+            BlogService.Client blogService = ThriftClient.getBlogService(transport);
+            Blog blog = mapper.readValue(IOUtils.toString(request.getReader()), Blog.class);
+            blog = blogService.updateBlog(blog);
+            this.setResponse(response, blog);
+        } catch (TException e) {
+            e.printStackTrace();
+            this.setResponseError(response);
+        } finally {
+            transport.close();
+        }
     }
 
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
-        if (id != null && !id.isEmpty()) {
-            this.blogService.deleteBlog(Long.parseLong(id));
-            SimpleResponse simpleResponse = new SimpleResponse();
-            simpleResponse.setReturnCode(1);
-            simpleResponse.setReturnMsg("success");
-            this.setResponse(response, simpleResponse);
-            return;
+        TTransport transport = ThriftClient.getTRANSPORT();
+        try {
+            BlogService.Client blogService = ThriftClient.getBlogService(transport);
+            String id = request.getParameter("id");
+            if (id != null && !id.isEmpty()) {
+                blogService.deleteBlog(Long.parseLong(id));
+                SimpleResponse simpleResponse = new SimpleResponse();
+                simpleResponse.setReturnCode(1);
+                simpleResponse.setReturnMsg("success");
+                this.setResponse(response, simpleResponse);
+                return;
+            }
+        } catch (TException e) {
+            e.printStackTrace();
+            this.setResponseError(response);
+        } finally {
+            transport.close();
         }
     }
 
@@ -63,5 +99,12 @@ public class BlogServlet extends HttpServlet {
         response.setCharacterEncoding(UTF_8);
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().println(this.mapper.writeValueAsString(obj));
+    }
+
+    private void setResponseError(HttpServletResponse response) throws IOException {
+        SimpleResponse simpleResponse = new SimpleResponse();
+        simpleResponse.setReturnCode(0);
+        simpleResponse.setReturnMsg("Error exception unexpected");
+        setResponse(response, simpleResponse);
     }
 }

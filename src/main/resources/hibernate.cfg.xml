@@ -24,7 +24,7 @@
         <!-- Echo all executed SQL to stdout -->
         <property name="show_sql">true</property>
 
-        <mapping class="vn.example.blog.entity.Blog" />
+        <mapping class="vn.example.blog.thrift.Blog" />
 
     </session-factory>
 

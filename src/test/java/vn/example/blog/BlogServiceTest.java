@@ -13,9 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vn.example.blog.entity.Blog;
-import vn.example.blog.repository.BlogRepository;
-import vn.example.blog.service.BlogService;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;

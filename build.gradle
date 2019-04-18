@@ -12,13 +12,23 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
-    implementation group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
-    implementation group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
+    compile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.16.v20190411'
+    compile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.16.v20190411'
+    compile group: 'javax.servlet', name: 'javax.servlet-api', version: '4.0.1'
     compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.34'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.8'
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'org.apache.thrift', name: 'libthrift', version: '0.12.0'
     compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.26'
+}
+task fatJar(type: Jar) {
+    zip64 true
+    manifest {
+        attributes 'Implementation-Title': 'Blog Api',
+                'Implementation-Version': version
+    }
+    baseName = 'blog_api'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }

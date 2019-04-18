@@ -4,10 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.thrift.TException;
 import org.apache.thrift.transport.TTransport;
+
+import lombok.val;
 import vn.example.blog.domain.SimpleResponse;
+import vn.example.blog.dto.BlogDto;
 import vn.example.blog.thrift.Blog;
 import vn.example.blog.thrift.BlogService;
 import vn.example.blog.thrift.client.ThriftClient;
+import vn.example.blog.thrift.client.ThriftClient.BlogClient;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -23,16 +27,36 @@ public class BlogServlet extends HttpServlet {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    private final vn.example.blog.service.BlogService blogService;
+    public BlogServlet(vn.example.blog.service.BlogService blogService){
+        this.blogService = blogService;
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String id = request.getParameter("id");
+        if (id != null && !id.isEmpty()) {
+            //return blog;
+            BlogDto dto = blogService.findById(Long.valueOf(id)).orElse(null);
+            blogService.HackGoogle();
+            if(dto == null){
+             // 404   
+             throw new BLogNotFound("Blog not found", 404);
+            }
+            else{
+
+            }
+        }
+
+        try(BlogClient blogClient = ThriftClient.createClient()){
+            val blogs = blogClient.getBlogs();
+        }
+
         TTransport transport = ThriftClient.getTRANSPORT();
         try {
             BlogService.Client blogService = ThriftClient.getBlogService(transport);
-            String id = request.getParameter("id");
-            if (id != null && !id.isEmpty()) {
-                Blog blog = blogService.getBlog(Long.parseLong(id));
-                this.setResponse(response, blog);
-                return;
-            }
+            
+     
             List<Blog> blogs = blogService.getBlogs();
             this.setResponse(response, blogs);
         } catch (TException e) {

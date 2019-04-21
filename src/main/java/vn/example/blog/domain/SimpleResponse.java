@@ -5,6 +5,14 @@ public class SimpleResponse {
 
     private String returnMsg;
 
+    public SimpleResponse() {
+    }
+
+    public SimpleResponse(int returnCode, String returnMsg) {
+        this.returnCode = returnCode;
+        this.returnMsg = returnMsg;
+    }
+
     public int getReturnCode() {
         return returnCode;
     }

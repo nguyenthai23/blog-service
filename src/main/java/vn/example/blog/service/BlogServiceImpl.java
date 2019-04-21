@@ -7,17 +7,16 @@ import java.util.stream.Collectors;
 
 import org.apache.thrift.TException;
 
-import lombok.val;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import vn.example.blog.dto.BlogDto;
 import vn.example.blog.mapper.BlogMapper;
 import vn.example.blog.pool.ClientProvider;
 import vn.example.blog.thrift.Blog;
 import vn.example.blog.thrift.client.ThriftClient.BlogClient;
 
-@Slf4j
 public class BlogServiceImpl implements BlogService {
-
+    private static final Logger log = LoggerFactory.getLogger(BlogServiceImpl.class);
     private final ClientProvider<BlogClient> blogClientProvider;
     private final BlogMapper blogMapper;
 
@@ -28,20 +27,71 @@ public class BlogServiceImpl implements BlogService {
 
     @Override
     public List<BlogDto> getAll() {
-        BlogClient b = blogClientProvider.obtain();
+        BlogClient blogClient = blogClientProvider.obtain();
         try {
-            return b.getBlogs().stream().map(tBlog -> blogMapper.domain2Dto(tBlog)).collect(Collectors.toList());
+            return blogClient.getBlogs().stream().map(tBlog -> blogMapper.domain2Dto(tBlog)).collect(Collectors.toList());
         } catch (TException ex) {
             log.error("Fail to get all blogs", ex);
             return Collections.emptyList();
         } finally {
-            blogClientProvider.release(b);
+            blogClientProvider.release(blogClient);
         }
     }
 
     @Override
-    public Optional<BlogDto> findById(int blogId) {
+    public Optional<BlogDto> findById(long blogId) {
+        BlogClient blogClient = this.blogClientProvider.obtain();
+        try {
+            Blog blog = blogClient.getBlog(blogId);
+            if (blog == null) {
+                return Optional.empty();
+            }
+            return Optional.of(blogMapper.domain2Dto(blog));
+        } catch (TException e) {
+            log.error("Fail to get blog", e);
+            return Optional.empty();
+        } finally {
+            this.blogClientProvider.release(blogClient);
+        }
+    }
+
+    @Override
+    public BlogDto createBlog(BlogDto blogDto) {
+        BlogClient blogClient = this.blogClientProvider.obtain();
+        try {
+            Blog blog = blogClient.createBlog(blogMapper.dto2Domain(blogDto));
+            return blogMapper.domain2Dto(blog);
+        } catch (TException e) {
+            log.error(e.getLocalizedMessage(), e);
+        } finally {
+            this.blogClientProvider.release(blogClient);
+        }
         return null;
     }
 
+    @Override
+    public BlogDto updateBlog(BlogDto blogDto) {
+        BlogClient blogClient = this.blogClientProvider.obtain();
+        try {
+            Blog blog = blogClient.updateBlog(blogMapper.dto2Domain(blogDto));
+            return blogMapper.domain2Dto(blog);
+        } catch (TException e) {
+            log.error(e.getLocalizedMessage(), e);
+        } finally {
+            this.blogClientProvider.release(blogClient);
+        }
+        return null;
+    }
+
+    @Override
+    public void deleteBlog(long id) {
+        BlogClient blogClient = this.blogClientProvider.obtain();
+        try {
+            blogClient.deleteBlog(id);
+        } catch (TException e) {
+            log.error(e.getLocalizedMessage(), e);
+        } finally {
+            this.blogClientProvider.release(blogClient);
+        }
+    }
 }

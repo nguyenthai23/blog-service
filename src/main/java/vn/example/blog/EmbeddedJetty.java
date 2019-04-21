@@ -1,10 +1,8 @@
 package vn.example.blog;
 
-import java.util.ArrayList;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
-import vn.example.blog.controller.BlogController;
+import vn.example.blog.servlet.BlogServlet;
 
 public class EmbeddedJetty {
 
@@ -21,12 +19,6 @@ public class EmbeddedJetty {
 
     private static void initHandler(ServletHandler servletHandler) {
         // Side effect
-        ArrayList
-        throw new Exception();
-
-        new BlogController(servletHandler);
+        servletHandler.addServletWithMapping(BlogServlet.class, "/blog");
     }
-
-
-
 }

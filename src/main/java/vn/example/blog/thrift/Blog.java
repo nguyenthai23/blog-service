@@ -202,7 +202,6 @@ public class Blog implements org.apache.thrift.TBase<Blog, Blog._Fields>, java.i
   }
 
   /** Returns true if field id is set (has been assigned a value) and false otherwise */
-  @JsonIgnore
   public boolean isSetId() {
     return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __ID_ISSET_ID);
   }
@@ -226,7 +225,6 @@ public class Blog implements org.apache.thrift.TBase<Blog, Blog._Fields>, java.i
   }
 
   /** Returns true if field status is set (has been assigned a value) and false otherwise */
-  @JsonIgnore
   public boolean isSetStatus() {
     return org.apache.thrift.EncodingUtils.testBit(__isset_bitfield, __STATUS_ISSET_ID);
   }
@@ -250,7 +248,6 @@ public class Blog implements org.apache.thrift.TBase<Blog, Blog._Fields>, java.i
   }
 
   /** Returns true if field title is set (has been assigned a value) and false otherwise */
-  @JsonIgnore
   public boolean isSetTitle() {
     return this.title != null;
   }
@@ -276,7 +273,6 @@ public class Blog implements org.apache.thrift.TBase<Blog, Blog._Fields>, java.i
   }
 
   /** Returns true if field content is set (has been assigned a value) and false otherwise */
-  @JsonIgnore
   public boolean isSetContent() {
     return this.content != null;
   }
@@ -328,7 +324,6 @@ public class Blog implements org.apache.thrift.TBase<Blog, Blog._Fields>, java.i
   }
 
   /** Returns true if field updatedDate is set (has been assigned a value) and false otherwise */
-  @JsonIgnore
   public boolean isSetUpdatedDate() {
     return this.updatedDate != null;
   }

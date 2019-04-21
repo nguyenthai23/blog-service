@@ -2,6 +2,7 @@ package vn.example.blog.pool;
 
 
 public interface ClientProvider<T> {
-    public T obtain();
-    public void release( T t );
+    T obtain();
+
+    void release(T t);
 }
